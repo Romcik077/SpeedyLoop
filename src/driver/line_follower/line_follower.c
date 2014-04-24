@@ -223,9 +223,6 @@ signed char lineFollowerUpdatePID(void)
 
 void routeObstacle(void)
 {
-//	l298SetPWMDuty(RIGHT, 0);
-//	l298SetPWMDuty(LEFT, 0);
-//	_delay_ms(2000);
 
 	l298SetDirection(RIGHT, BACKWARD);
 	l298SetDirection(LEFT, BACKWARD);
