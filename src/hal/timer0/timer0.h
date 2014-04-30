@@ -97,7 +97,7 @@ void timer0ClearOverflowCount(void);	///< Clear timer0's overflow counter.
 long timer0GetOverflowCount(void);		///< read timer0's overflow counter
 
 void timer0CTCInit(void);
-void timer0CTCSetPeriod(uint8_t period);
+void timer0CTCSetPeriod(uint16_t period);
 
 /// Enter standard PWM Mode on timer0.
 void timer0PWMInit(void);

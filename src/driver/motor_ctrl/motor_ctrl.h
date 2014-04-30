@@ -11,13 +11,9 @@
 #include <avr/io.h>
 #include <global.h>
 #include <math.h>
-#include <hal/timer0/timer0.h>
 #include <driver/encoder/encoder.h>
 #include <driver/l298/l298.h>
 #include <driver/pid_controller/pid_controller.h>
-
-// Period for update of PID controller (*10ms)
-#define PID_PERIOD 10
 
 // Wheel diameter in mm
 #define WHEEL_DIAM	31.0

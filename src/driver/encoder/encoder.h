@@ -11,7 +11,6 @@
 #include <avr/io.h>
 #include <global.h>
 #include <avr/interrupt.h>
-#include <hal/timer0/timer0.h>
 
 // Configurations of pins
 #define ENCODER1	0
@@ -41,9 +40,6 @@
 #define ENCODER_FORWARD		1
 #define ENCODER_BACKWARD	2
 
-// Necessary constant
-#define TIMER_PERIOD_MS 10
-
 // Declaration of functions
 // Software and hardware initialization
 void encoderInit(void);
@@ -54,7 +50,7 @@ double encoderGetSpeed(uint8_t encoder);
 // Return direction of encoder rotating
 uint8_t encoderGetDirection(uint8_t encoder);
 
-// Calculate the motor speed in rpm using a timer in 10ms
+// Calculate the motor speed in rpm using a timer with 100ms period
 void encoderProcesingData(void);
 
 #endif /* ENCODER_H_ */

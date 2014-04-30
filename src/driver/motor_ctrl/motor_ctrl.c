@@ -40,11 +40,6 @@ void motorInit(void)
 	l298SetPWMDuty(MOTOR2, 0);
 	encoderInit();
 
-	// Initialize timer0 for speed control
-	timer0Init(TIMER_CLK_DIV1024);
-	timer0CTCInit();
-	timer0CTCSetPeriod(20);
-	timer0Attach(TIMER0_OUTCOMPAREA_INT, motorProcesingSpeed);
 }
 
 void motorStart(char motor)
@@ -198,47 +193,39 @@ PidSettings motorGetPIDState(char motor)
 	return (PidSettings){0, 0, 0, 0};
 }
 
+// call this task every 50ms
 void motorProcesingSpeed(void)
 {
 	double rightSpeed, leftSpeed;
-	// Update the current speed of motors
-	encoderProcesingData();
-	motorRight.motorState.currentSpeed = encoderGetSpeed(ENCODER_RIGHT);
-	motorLeft.motorState.currentSpeed = encoderGetSpeed(ENCODER_LEFT);
 
-	periodCounter++;
-	if(periodCounter > PID_PERIOD)
+	if(motorRight.motorState.state != STOP)
 	{
-		if(motorRight.motorState.state != STOP)
+		rightSpeed = updatePID(&motorRight.motorPidSettings, &motorRight.motorPidState);
+		rightSpeed = l298GetPWMDuty(RIGHT) + rightSpeed;
+		l298SetPWMDuty(RIGHT, (uint16_t)(rightSpeed));
+		if(l298GetStatus(RIGHT) == STOP)
 		{
-			rightSpeed = updatePID(&motorRight.motorPidSettings, &motorRight.motorPidState);
-			rightSpeed = l298GetPWMDuty(RIGHT) + rightSpeed;
-			l298SetPWMDuty(RIGHT, (uint16_t)(rightSpeed));
-			if(l298GetStatus(RIGHT) == STOP)
-			{
-				l298Start(RIGHT);
-			}
-		} else if(l298GetStatus(RIGHT) != STOP)
-		{
-			l298Stop(RIGHT);
-			motorRight.motorPidState = (PidState){0, 0, 0};
+			l298Start(RIGHT);
 		}
-
-		if(motorLeft.motorState.state != STOP)
-		{
-			leftSpeed = updatePID(&motorLeft.motorPidSettings, &motorLeft.motorPidState);
-			leftSpeed = l298GetPWMDuty(LEFT) + leftSpeed;
-			l298SetPWMDuty(LEFT, (uint16_t)(leftSpeed));
-			if(l298GetStatus(LEFT) == STOP)
-			{
-				l298Start(LEFT);
-			}
-		} else if(l298GetStatus(LEFT) != STOP)
-		{
-			l298Stop(LEFT);
-			motorLeft.motorPidState = (PidState){0, 0, 0};
-		}
-
-		periodCounter = 0;
+	} else if(l298GetStatus(RIGHT) != STOP)
+	{
+		l298Stop(RIGHT);
+		motorRight.motorPidState = (PidState){0, 0, 0};
 	}
+
+	if(motorLeft.motorState.state != STOP)
+	{
+		leftSpeed = updatePID(&motorLeft.motorPidSettings, &motorLeft.motorPidState);
+		leftSpeed = l298GetPWMDuty(LEFT) + leftSpeed;
+		l298SetPWMDuty(LEFT, (uint16_t)(leftSpeed));
+		if(l298GetStatus(LEFT) == STOP)
+		{
+			l298Start(LEFT);
+		}
+	} else if(l298GetStatus(LEFT) != STOP)
+	{
+		l298Stop(LEFT);
+		motorLeft.motorPidState = (PidState){0, 0, 0};
+	}
+
 }

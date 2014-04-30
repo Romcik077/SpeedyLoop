@@ -7,6 +7,12 @@
 
 #include "encoder.h"
 
+#define MEASURE_PERIOD_MS	50
+#define NUMBER_OF_TOOTHS	3
+
+// (encoderCount/numberTooths)*(60000/measurePeriodms)
+const double encoderMeasureCoeficient = (60000.0/MEASURE_PERIOD_MS)/NUMBER_OF_TOOTHS;
+
 // Declaration of variables
 volatile double encoder1Speed;
 volatile double encoder2Speed;
@@ -30,12 +36,6 @@ void encoderInit(void)
 	sbi(PCMSK2, OUT1A_PCINT);
 	sbi(PCMSK2, OUT2A_PCINT);
 	sbi(PCICR, PCIE2);
-
-//	// Initialize timer0 for speed control
-//	timer0Init(TIMER_CLK_DIV1024);
-//	timer0CTCInit();
-//	timer0CTCSetPeriod(20);
-//	timer0Attach(TIMER0_OUTCOMPAREA_INT, encoderProcesingData);
 
 	// Enable global interrupts
 	sei();
@@ -82,32 +82,27 @@ uint8_t encoderGetDirection(uint8_t encoder)
 	return -1;
 }
 
-// Every 10ms this function will be call for calculate speed motor, using timer0
+// Every 50ms this function need to be call for calculate speed motor
 void encoderProcesingData(void)
 {
-	timerCount++;
-	if(timerCount > 9)
-	{
-		// 120 - 5 tooth, 200 - 3 tooth
 		if(encoder1Direction == ENCODER_FORWARD)
 		{
-			encoder1Speed = (encoder1Count*200.0);///5.0)*(600.0);///3.0)*(600.0);
+			encoder1Speed = (encoder1Count*encoderMeasureCoeficient);
 		} else {
-			encoder1Speed = -(encoder1Count*200.0);
+			encoder1Speed = -(encoder1Count*encoderMeasureCoeficient);
 		}
 
 		if(encoder1Direction == ENCODER_FORWARD)
 		{
-			encoder2Speed = (encoder2Count*200.0);///5.0)*(600.0);///3.0)*(600.0);
+			encoder2Speed = (encoder2Count*encoderMeasureCoeficient);
 		} else {
-			encoder2Speed = -(encoder2Count*200.0);
+			encoder2Speed = -(encoder2Count*encoderMeasureCoeficient);
 		}
 
 		encoder1Count = 0;
 		encoder2Count = 0;
 
 		timerCount = 0;
-	}
 }
 
 // This interrupt using for enumerate the changes state of encoders

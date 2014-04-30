@@ -15,7 +15,6 @@ double time = 0;
 unsigned char timerPornit = 0;
 
 void routeObstacle(void);
-void timeProcesing(void);
 
 void lineFollowerInit(void)
 {
@@ -34,13 +33,8 @@ void lineFollowerInit(void)
 	// Initialization of line sensor
 	lineSenseInit();
 
+	// Initialiation of distance sensors
 	distanceSenseInit();
-
-	// Initialize timer0 for speed control
-	timer0Init(TIMER_CLK_DIV1024);
-	timer0CTCInit();
-	timer0CTCSetPeriod(20);
-//	timer0Attach(TIMER0_OUTCOMPAREA_INT, timeProcesing);
 
 	// Setting the PID parameters
 	lineFollowerPID.lineFollowerPidSettings =
@@ -115,12 +109,6 @@ signed char lineFollowerUpdatePID(void)
 
 	if(lineFollowerPID.lineFollowerState == LINEF_START)
 	{
-		// Attach interrupt for calculate time
-		if(timerPornit == 0)
-		{
-			timer0Attach(TIMER0_OUTCOMPAREA_INT, timeProcesing);
-			timerPornit = 1;
-		}
 
 		// Measure the front distance for get obstacle
 		tempDistance = distanceSenseGet(FRONT_SENSE, CM_SENSE);
@@ -140,37 +128,8 @@ signed char lineFollowerUpdatePID(void)
 		rightSpeed = lineFollowerPID.targetSpeed;
 		leftSpeed = lineFollowerPID.targetSpeed;
 
-		if(lineFollowerPID.lineFollwerPidState.error < 0)
-		{
-			rightSpeed /= (lineFollowerPID.lineFollwerPidState.error * -1)/1.5;
-			leftSpeed /= (lineFollowerPID.lineFollwerPidState.error * -1)/1.5;
-		}
-		if(lineFollowerPID.lineFollwerPidState.error > 0) {
-			rightSpeed /= (lineFollowerPID.lineFollwerPidState.error)/1.5;
-			leftSpeed /= (lineFollowerPID.lineFollwerPidState.error)/1.5;
-		}
-
-//		dtostrf(pidTerm, 6, 2, tempchar2);
-//		printf("pidTerm: %s\n", tempchar2);
-
-		if(pidTerm < 0)
-		{
-			rightSpeed += pidTerm*2;
-			leftSpeed -= pidTerm;
-		}
-		if(pidTerm > 0)
-		{
-			rightSpeed += pidTerm;
-			leftSpeed -= pidTerm*2;
-		}
-
-//		rightSpeed += pidTerm;
-//		leftSpeed -= pidTerm;
-
-//		dtostrf(rightSpeed, 6, 2, tempchar2);
-//		printf("rightSpeed: %s\n", tempchar2);
-//		dtostrf(leftSpeed, 6, 2, tempchar2);
-//		printf("leftSpeed: %s\n", tempchar2);
+		rightSpeed += pidTerm;
+		leftSpeed -= pidTerm;
 
 		if(leftSpeed < 0)
 		{
@@ -214,8 +173,6 @@ signed char lineFollowerUpdatePID(void)
 		l298Stop(LEFT);
 		l298SetPWMDuty(RIGHT, 0);
 		l298SetPWMDuty(LEFT, 0);
-		timer0Detach(TIMER0_OUTCOMPAREA_INT);
-		time = 0;
 		obstacolDetectat = 0;
 	}
 	return 0;
@@ -262,9 +219,4 @@ void routeObstacle(void)
 //	l298SetPWMDuty(RIGHT, 12000);
 //	l298SetPWMDuty(LEFT, 12000);
 
-}
-
-void timeProcesing(void)
-{
-	time += 0.01;
 }

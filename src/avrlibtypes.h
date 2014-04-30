@@ -28,6 +28,8 @@
 	#define TRUE	-1
 #endif
 
+typedef void (*voidFuncPtr)(void);
+
 // datatype definitions macros
 typedef unsigned char  u08;
 typedef   signed char  s08;

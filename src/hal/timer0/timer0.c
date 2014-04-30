@@ -106,11 +106,11 @@ void timer0CTCInit(void)
 	OCR0A = 0;
 }
 
-void timer0CTCSetPeriod(uint8_t period)
+void timer0CTCSetPeriod(uint16_t period)
 {
 	//int temp = (F_CPU*((float)period/1000))/(2*timer0GetPrescaler())-1;
-	//int temp = (F_CPU)/(2*timer0GetPrescaler()*period)-1;
-	OCR0A = 154;
+	int temp = (F_CPU)/(timer0GetPrescaler()*1000000/period)-1;
+	OCR0A = temp;
 }
 
 void timer0PWMInit(void)
