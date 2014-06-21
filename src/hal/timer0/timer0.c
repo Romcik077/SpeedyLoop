@@ -6,6 +6,7 @@
  */
 
 #include "timer0.h"
+#include <stdio.h>
 
 // Program ROM constants
 // the prescale division values stored in order of timer control register index
@@ -13,7 +14,6 @@
 const unsigned short __attribute__ ((progmem)) Timer0PrescaleFactor[] = {0,1,8,64,256,1024};
 
 volatile unsigned long Timer0Reg0;
-typedef void (*voidFuncPtr)(void);
 volatile static voidFuncPtr Timer0IntFunc[TIMER0_NUM_INTERRUPTS];
 
 void timer0Init(uint8_t prescale)
@@ -110,6 +110,7 @@ void timer0CTCSetPeriod(uint16_t period)
 {
 	//int temp = (F_CPU*((float)period/1000))/(2*timer0GetPrescaler())-1;
 	int temp = (F_CPU)/(timer0GetPrescaler()*1000000/period)-1;
+//	printf("OCR: %d", temp);
 	OCR0A = temp;
 }
 

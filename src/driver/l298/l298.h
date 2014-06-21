@@ -52,7 +52,7 @@ typedef struct
 {
 	uint8_t status;
 	uint8_t direction;
-	uint16_t pwmDuty;
+	long pwmDuty;
 } motorParameters;
 
 motorParameters motor1, motor2;
@@ -66,7 +66,7 @@ void l298Stop(uint8_t _motor);
 
 char l298GetStatus(char _motor);
 
-void l298SetPWMDuty(uint8_t _motor, int16_t _duty);
+void l298SetPWMDuty(uint8_t _motor, long _duty);
 
 uint16_t l298GetPWMDuty(uint8_t _motor);
 

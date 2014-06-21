@@ -18,6 +18,9 @@ UCHAR tasksInQueue;
 ULONG schedulerTime;
 voidFuncPtr nextRunFunction = 0;
 
+
+//const unsigned long CYCLIC_TIMEx8 = ((long)TASK_PERIOD*8);
+
 /******************************************************************************
 *   Functions
 ******************************************************************************/
@@ -31,6 +34,7 @@ void schedulerInit(void)
 	timer0CTCInit();
 	timer0CTCSetPeriod(TASK_PERIOD);// in us
 }
+
 /* This function add the task in schedular queue.
 **   Parameters:
 **	@function - function reference for task
@@ -38,7 +42,7 @@ void schedulerInit(void)
 **   Returns:
 **	@STATUS - status of operation
 */
-unsigned char schedulerAddTask(voidFuncPtr function, UCHAR priority)
+unsigned char schedulerAddTask(voidFuncPtr function, unsigned long priority)
 {
 	unsigned char status = ERROR;
 	schedulerTask tempTask;
@@ -148,6 +152,7 @@ unsigned char schedulerStart(void)
 	unsigned char status = ERROR;
 	timer0Attach(TIMER0_OUTCOMPAREA_INT, &schedularTick);
 	status = OK;
+	sei();
 	return status;
 }
 
@@ -160,7 +165,7 @@ unsigned char schedulerStart(void)
 unsigned char schedulerStop(void)
 {
 	unsigned char status = ERROR;
-	timer0Detach(TIMER0_OUTCOMPAREA_INT, &schedularTick);
+	timer0Detach(TIMER0_OUTCOMPAREA_INT);
 	status = OK;
 	return status;
 }

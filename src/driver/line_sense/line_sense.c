@@ -22,7 +22,7 @@ const signed char mapLine[16] =
 
 const double mapVoltageLine[16] =
 {
-	3.1, 2.8, 2.5, 2.2, 1.5, 1.2, 1.0, 1.0, 1.0, 1.0, 1.2, 1.5, 2.2, 2.5, 2.8, 3.1
+	1.2, 0.9, 0.3, 0.3, 0.3, 0.7, 0.7, 1.0, 1.0, 1.0, 0.3, 0.3, 0.3, 0.5, 0.9, 1.2
 };
 
 inline void selectCHIP1(void)

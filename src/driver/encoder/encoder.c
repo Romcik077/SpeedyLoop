@@ -7,7 +7,7 @@
 
 #include "encoder.h"
 
-#define MEASURE_PERIOD_MS	50
+#define MEASURE_PERIOD_MS	40
 #define NUMBER_OF_TOOTHS	3
 
 // (encoderCount/numberTooths)*(60000/measurePeriodms)
@@ -89,20 +89,18 @@ void encoderProcesingData(void)
 		{
 			encoder1Speed = (encoder1Count*encoderMeasureCoeficient);
 		} else {
-			encoder1Speed = -(encoder1Count*encoderMeasureCoeficient);
+			encoder1Speed = 0 - (encoder1Count*encoderMeasureCoeficient);
 		}
 
-		if(encoder1Direction == ENCODER_FORWARD)
+		if(encoder2Direction == ENCODER_FORWARD)
 		{
 			encoder2Speed = (encoder2Count*encoderMeasureCoeficient);
 		} else {
-			encoder2Speed = -(encoder2Count*encoderMeasureCoeficient);
+			encoder2Speed = 0 - (encoder2Count*encoderMeasureCoeficient);
 		}
 
 		encoder1Count = 0;
 		encoder2Count = 0;
-
-		timerCount = 0;
 }
 
 // This interrupt using for enumerate the changes state of encoders
@@ -118,10 +116,10 @@ ISR(PCINT2_vect)
 		if(out1BState)
 		{
 			encoder1Count++;
-			encoder1Direction = ENCODER_FORWARD;
+			encoder1Direction = ENCODER_BACKWARD;
 		} else {
 			encoder1Count++;
-			encoder1Direction = ENCODER_BACKWARD;
+			encoder1Direction = ENCODER_FORWARD;
 		}
 	}
 

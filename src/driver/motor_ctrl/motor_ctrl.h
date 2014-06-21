@@ -40,8 +40,8 @@
 // Structure for state of motor
 typedef struct
 {
-	signed int currentSpeed;
-	signed int targetSpeed;
+	signed long currentSpeed;
+	signed long targetSpeed;
 	char direction;
 	char state;
 } MotorState;
@@ -69,6 +69,8 @@ void motorStart(char motor);
  * Stop the motor
  */
 void motorStop(char motor);
+
+char motorGetStatus(char motor);
 
 /*
  * Set the direction for motor

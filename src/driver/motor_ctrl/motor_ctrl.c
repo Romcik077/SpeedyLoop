@@ -70,6 +70,21 @@ void motorStop(char motor)
 	}
 }
 
+char motorGetStatus(char motor)
+{
+	switch (motor) {
+		case RIGHT:
+			return motorRight.motorState.state;
+			break;
+		case LEFT:
+			return motorLeft.motorState.state;
+			break;
+		default:
+			break;
+	}
+	return -1;
+}
+
 void motorSetDirection(char motor, char direction)
 {
 	switch (motor) {
@@ -101,6 +116,14 @@ char motorGetDirection(char motor)
 
 void motorSetSpeed(char motor, double speed, char units)
 {
+	if(speed > 30000)
+	{
+		speed = 30000;
+	}
+	if(speed < -30000)
+	{
+		speed = -30000;
+	}
 	switch (units) {
 		case RPM:
 			speed = 200.0 * round(speed / 200.0);
@@ -197,6 +220,9 @@ PidSettings motorGetPIDState(char motor)
 void motorProcesingSpeed(void)
 {
 	double rightSpeed, leftSpeed;
+
+	motorRight.motorPidState.error = motorRight.motorState.targetSpeed - encoderGetSpeed(ENCODER_RIGHT);
+	motorLeft.motorPidState.error = motorLeft.motorState.targetSpeed - encoderGetSpeed(ENCODER_LEFT);
 
 	if(motorRight.motorState.state != STOP)
 	{

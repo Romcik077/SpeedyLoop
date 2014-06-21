@@ -19,9 +19,13 @@
 #define LINEF_STOP	1
 
 // Default coefficients of PID controller
-#define P_LINE_GAIN 700
+//#define P_LINE_GAIN 3600
+//#define P_LINE_GAIN 4100	// 32000
+#define P_LINE_GAIN 5300
 #define I_LINE_GAIN	0
-#define D_LINE_GAIN	3000
+//#define D_LINE_GAIN	2000
+//#define D_LINE_GAIN	4000	// 32000
+#define D_LINE_GAIN	5000
 #define I_LINE_MIN	-3000
 #define I_LINE_MAX	3000
 
@@ -45,6 +49,6 @@ void lineFollowerSetSpeed(double speed, char units);
 
 double lineFollowerGetSpeed(char units);
 
-signed char lineFollowerUpdatePID(void);
+void lineFollowerUpdatePID(void);
 
 #endif /* LINE_FOLLOWER_H_ */

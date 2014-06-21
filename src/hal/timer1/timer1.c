@@ -12,7 +12,6 @@
 // STOP, CLK, CLK/8, CLK/64, CLK/256, CLK/1024
 const unsigned short __attribute__ ((progmem)) Timer1PrescaleFactor[] = {0,1,8,64,256,1024};
 
-typedef void (*voidFuncPtr)(void);
 volatile static voidFuncPtr Timer1IntFunc[TIMER1_NUM_INTERRUPTS];
 
 void timer1Init(uint8_t _prescaler)

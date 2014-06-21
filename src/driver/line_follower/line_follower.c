@@ -20,10 +20,10 @@ void lineFollowerInit(void)
 {
 	// Initialization of motor control
 //	motorInit();
-//	motorStop(MOTOR1);
-//	motorStop(MOTOR2);
-//	motorSetSpeed(MOTOR1, 0, RPM);
-//	motorSetSpeed(MOTOR2, 0, RPM);
+//	motorStop(RIGHT);
+//	motorStop(LEFT);
+//	motorSetSpeed(RIGHT, 0, RPM);
+//	motorSetSpeed(LEFT, 0, RPM);
 	l298Init();
 	l298Stop(RIGHT);
 	l298Stop(LEFT);
@@ -41,7 +41,9 @@ void lineFollowerInit(void)
 	(PidSettings){ I_LINE_MAX, I_LINE_MIN, I_LINE_GAIN, P_LINE_GAIN, D_LINE_GAIN };
 	lineFollowerPID.lineFollwerPidState = (PidState){ 0, 0, 0};
 	lineFollowerPID.lineFollowerState = LINEF_STOP;
-	lineFollowerPID.targetSpeed = 23000;
+//	lineFollowerPID.targetSpeed = 21000;
+//	lineFollowerPID.targetSpeed = 32000;
+	lineFollowerPID.targetSpeed = 40000;
 }
 
 void lineFollowerStart(void)
@@ -101,7 +103,7 @@ double lineFollowerGetSpeed(char units)
 	return speed;
 }
 
-signed char lineFollowerUpdatePID(void)
+void lineFollowerUpdatePID(void)
 {
 	double rightSpeed, leftSpeed, pidTerm;
 //	char tempchar2[16];
@@ -111,63 +113,57 @@ signed char lineFollowerUpdatePID(void)
 	{
 
 		// Measure the front distance for get obstacle
-		tempDistance = distanceSenseGet(FRONT_SENSE, CM_SENSE);
-		if(tempDistance < 25 && obstacolDetectat == 0)
+		tempDistance = distanceSenseGet(SIDE_SENSE, CM_SENSE);
+		if(tempDistance < 10 && obstacolDetectat == 0)
 		{
 			routeObstacle();
 			obstacolDetectat = 1;
-			lineFollowerPID.targetSpeed = 30000;
-			return -1;
+//			return -1;
 		}
 
 		// Get error for followed line
 		lineFollowerPID.lineFollwerPidState.error = lineSenseGetError();
+		if(lineFollowerPID.lineFollwerPidState.error == -20)
+		{
+			return;
+		}
 
 		pidTerm = updatePID(&lineFollowerPID.lineFollowerPidSettings, &lineFollowerPID.lineFollwerPidState);
 
 		rightSpeed = lineFollowerPID.targetSpeed;
 		leftSpeed = lineFollowerPID.targetSpeed;
 
-		rightSpeed += pidTerm;
-		leftSpeed -= pidTerm;
-
-		if(leftSpeed < 0)
+		if(pidTerm < 0)
 		{
-			leftSpeed *= -1;
-			leftSpeed *= 1.4;
-			if(leftSpeed > 65000)
-				leftSpeed = 65000;
-			l298Start(LEFT);
-			l298SetDirection(LEFT, BACKWARD);
-			l298SetPWMDuty(LEFT, leftSpeed);
-		} else {
-			if(leftSpeed > 65000)
-				leftSpeed = 65000;
-			l298Start(LEFT);
-			l298SetDirection(LEFT, FORWARD);
-			l298SetPWMDuty(LEFT, leftSpeed);
+			rightSpeed = lineFollowerPID.targetSpeed + pidTerm;
+		}
+		if(pidTerm > 0)
+		{
+			leftSpeed = lineFollowerPID.targetSpeed - pidTerm;
 		}
 
-		if(rightSpeed < 0)
-		{
-			rightSpeed *= -1;
-			rightSpeed *= 1.4;
-			if(rightSpeed > 65000)
-				rightSpeed = 65000;
-			l298Start(RIGHT);
-			l298SetDirection(RIGHT, BACKWARD);
-			l298SetPWMDuty(RIGHT, rightSpeed);
-		} else {
-//			rightSpeed *= 2.5;
-			if(rightSpeed > 65000)
-				rightSpeed = 65000;
-			l298Start(RIGHT);
-			l298SetDirection(RIGHT, FORWARD);
-			l298SetPWMDuty(RIGHT, rightSpeed);
-		}
+		printf("rightSpeed: %d\n", (int16_t)rightSpeed);
+		printf("leftSpeed: %d\n", (int16_t)leftSpeed);
+
+//		if(leftSpeed < 0)
+//		{
+//			leftSpeed *= 2;
+//		}
+//
+//		if(rightSpeed < 0)
+//		{
+//			rightSpeed *= 2;
+//		}
+
+		l298SetPWMDuty(RIGHT, (long)rightSpeed);
+		l298Start(RIGHT);
+		l298SetPWMDuty(LEFT, (long)leftSpeed);
+		l298Start(LEFT);
 
 
 	} else {
+//		motorStop(RIGHT);
+//		motorStop(LEFT);
 		l298Init();
 		l298Stop(RIGHT);
 		l298Stop(LEFT);
@@ -175,48 +171,21 @@ signed char lineFollowerUpdatePID(void)
 		l298SetPWMDuty(LEFT, 0);
 		obstacolDetectat = 0;
 	}
-	return 0;
+//	return 0;
 }
 
 void routeObstacle(void)
 {
 
-	l298SetDirection(RIGHT, BACKWARD);
-	l298SetDirection(LEFT, BACKWARD);
-	l298SetPWMDuty(RIGHT, 5000);
-	l298SetPWMDuty(LEFT, 5000);
-	_delay_ms(400);
-
-	l298SetDirection(RIGHT, FORWARD);
-	l298SetDirection(LEFT, FORWARD);
-	l298SetPWMDuty(RIGHT, 25000);
-	l298SetPWMDuty(LEFT, 0);
-	_delay_ms(250);
-	l298SetPWMDuty(RIGHT, 12000);
-	l298SetPWMDuty(LEFT, 12000);
-	_delay_ms(350);
-	l298SetPWMDuty(RIGHT, 0);
-	l298SetPWMDuty(LEFT, 20000);
-	_delay_ms(700);
-	l298SetPWMDuty(RIGHT, 12000);
-	l298SetPWMDuty(LEFT, 12000);
+	l298SetPWMDuty(RIGHT, 40000);
+	l298SetPWMDuty(LEFT, 25000);
 	_delay_ms(600);
-	l298SetPWMDuty(RIGHT, 12000);
+
+	l298SetPWMDuty(RIGHT, 40000);
 	l298SetPWMDuty(LEFT, 0);
-	_delay_ms(300);
+	_delay_ms(600);
 
-//	while(distanceSenseGet(SIDE_SENSE, CM_SENSE) < 10);
-
-//	l298SetPWMDuty(RIGHT, 0);
-//	l298SetPWMDuty(LEFT, 12000);
-//	_delay_ms(500);
-//	l298SetPWMDuty(RIGHT, 12000);
-//	l298SetPWMDuty(LEFT, 12000);
-//	_delay_ms(500);
-//	l298SetPWMDuty(RIGHT, 12000);
-//	l298SetPWMDuty(LEFT, 0);
-//	_delay_ms(500);
-//	l298SetPWMDuty(RIGHT, 12000);
-//	l298SetPWMDuty(LEFT, 12000);
-
+	l298SetPWMDuty(RIGHT, 40000);
+	l298SetPWMDuty(LEFT, 25000);
+	_delay_ms(600);
 }

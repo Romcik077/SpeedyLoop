@@ -12,6 +12,7 @@
 *	Include files
 ******************************************************************************/
 #include <avr/io.h>
+#include <stdio.h>
 #include "global.h"
 #include "hal/timer0/timer0.h"
 
@@ -23,16 +24,16 @@
 #define MAX_NUM_OF_TASKS	6
 #define TASK_PERIOD			5000 // us // max. task period 13ms, if need longer task period change clock timer
 
-#define CYCLIC_TIME_0		TASK_PERIOD // not recomended to use, usage ALL 100% of CPU
-#define CYCLIC_TIMEx2		TASK_PERIOD*2		// usage 50% of CPU
-#define CYCLIC_TIMEx4	 	TASK_PERIOD*4		// usage 25% of CPU
-#define CYCLIC_TIMEx8		TASK_PERIOD*8		// usage 12.5% of CPU
-#define CYCLIC_TIMEx16		TASK_PERIOD*16		// usage 6.25% of CPU
-#define CYCLIC_TIMEx32		TASK_PERIOD*32		// usage 3.125% of CPU
-#define CYCLIC_TIMEx64 		TASK_PERIOD*64		// usage 1.5625% of CPU
-#define CYCLIC_TIMEx128		TASK_PERIOD*128	// usage 0.78125% of CPU
+#define CYCLIC_TIME_0		(unsigned long)TASK_PERIOD // not recomended to use, usage ALL 100% of CPU
+#define CYCLIC_TIMEx2		((unsigned long)TASK_PERIOD*2)		// usage 50% of CPU
+#define CYCLIC_TIMEx4	 	((unsigned long)TASK_PERIOD*4)		// usage 25% of CPU
+#define CYCLIC_TIMEx8		((unsigned long)TASK_PERIOD*8)		// usage 12.5% of CPU
+#define CYCLIC_TIMEx16		((unsigned long)TASK_PERIOD*16)		// usage 6.25% of CPU
+#define CYCLIC_TIMEx32		((unsigned long)TASK_PERIOD*32)		// usage 3.125% of CPU
+#define CYCLIC_TIMEx64 		((unsigned long)TASK_PERIOD*64)		// usage 1.5625% of CPU
+#define CYCLIC_TIMEx128		((unsigned long)TASK_PERIOD*128)	// usage 0.78125% of CPU
 
-#define TIMER_CLOCK			5000000 //Hz //update this with changed timer clock
+//#define TIMER_CLOCK			5000000 //Hz //update this with changed timer clock
 
 #define OK		0
 #define ERROR	1
@@ -43,8 +44,8 @@
 typedef struct schedulerTask
 {
 	voidFuncPtr		taskFunction;
-	UCHAR			taskPriority;
-	ULONG			taskNextTime;
+	unsigned long	taskPriority;
+	unsigned long	taskNextTime;
 } schedulerTask;
 
 extern schedulerTask taskQueue[MAX_NUM_OF_TASKS];
@@ -55,11 +56,11 @@ extern ULONG schedulerTime;
 *	Function define
 ******************************************************************************/
 void schedulerInit(void);
-unsigned char schedulerAddTask(voidFuncPtr function, UCHAR priority);
+unsigned char schedulerAddTask(voidFuncPtr function, unsigned long priority);
 unsigned char schedulerRemoveTask(voidFuncPtr function);
 unsigned char schedulerStart(void);
 unsigned char schedulerStop(void);
-unsigned char schedulerSetTaskPeriod(float taskPeriod);
+unsigned char schedulerSetTaskPeriod(uint16_t taskPeriod);
 void schedulerUpdate(void);
 void schedularTick(void);
 

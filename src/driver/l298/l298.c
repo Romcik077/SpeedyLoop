@@ -49,13 +49,13 @@ void l298Start(uint8_t _motor)
 		case MOTOR1:
 			switch (motor1.direction) {
 				case FORWARD:
-					timer1PWMASet(motor1.pwmDuty);
+					timer1PWMASet((uint16_t)motor1.pwmDuty);
 					cbi(DIR1A_PORT, DIR1A_PIN);
 					sbi(DIR1B_PORT, DIR1B_PIN);
 					motor1.status = FORWARD;
 					break;
 				case BACKWARD:
-					timer1PWMASet(motor1.pwmDuty);
+					timer1PWMASet((uint16_t)motor1.pwmDuty);
 					sbi(DIR1A_PORT, DIR1A_PIN);
 					cbi(DIR1B_PORT, DIR1B_PIN);
 					motor1.status = BACKWARD;
@@ -67,7 +67,7 @@ void l298Start(uint8_t _motor)
 		case MOTOR2:
 			switch (motor2.direction) {
 				case FORWARD:
-					timer1PWMBSet(motor2.pwmDuty);
+					timer1PWMBSet((uint16_t)motor2.pwmDuty);
 					sbi(DIR2A_PORT, DIR2A_PIN);
 					cbi(DIR2B_PORT, DIR2B_PIN);
 					motor2.status = FORWARD;
@@ -120,7 +120,7 @@ char l298GetStatus(char _motor)
 	return -1;
 }
 
-void l298SetPWMDuty(uint8_t _motor, int16_t _duty)
+void l298SetPWMDuty(uint8_t _motor, long _duty)
 {
 	switch (_motor) {
 		case MOTOR1:
